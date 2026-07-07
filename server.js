@@ -1,11 +1,16 @@
 'use strict';
 
 const path = require('node:path');
+const fs = require('node:fs');
 const crypto = require('node:crypto');
 const http = require('node:http');
 const express = require('express');
 const { Server } = require('socket.io');
-const { GameRoom, MAX_PLAYERS } = require('./src/game-room');
+const structuredSource = path.join(__dirname, 'src', 'game-room.js');
+const gameRoomPath = fs.existsSync(structuredSource)
+  ? structuredSource
+  : path.join(__dirname, 'game-room.js');
+const { GameRoom, MAX_PLAYERS } = require(gameRoomPath);
 
 const PORT = Number(process.env.PORT) || 3000;
 const app = express();
@@ -20,14 +25,41 @@ const socketSessions = new Map();
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
-app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders(res, filePath) {
-    if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.webmanifest')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+const structuredPublic = path.join(__dirname, 'public');
+const usesStructuredFolders = fs.existsSync(path.join(structuredPublic, 'index.html'));
+
+if (usesStructuredFolders) {
+  app.use(express.static(structuredPublic, {
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.webmanifest')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      }
     }
-  }
+  }));
+} else {
+  // Compatibility mode for GitHub uploads where public/src folders were flattened.
+  const sendFlat = (filename, noCache = false) => (_req, res) => {
+    if (noCache) res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.sendFile(path.join(__dirname, filename));
+  };
+
+  app.get(['/', '/index.html'], sendFlat('index.html'));
+  app.get('/app.js', sendFlat('app.js'));
+  app.get('/styles.css', sendFlat('styles.css'));
+  app.get('/manifest.webmanifest', sendFlat('manifest.webmanifest', true));
+  app.get('/sw.js', sendFlat('sw.js', true));
+  app.get('/icons/icon-192.png', sendFlat('icon-192.png'));
+  app.get('/icons/icon-512.png', sendFlat('icon-512.png'));
+  app.get('/icons/apple-touch-icon.png', sendFlat('apple-touch-icon.png'));
+}
+
+app.get('/health', (_req, res) => res.json({
+  ok: true,
+  rooms: rooms.size,
+  layout: usesStructuredFolders ? 'folders' : 'flat',
+  time: new Date().toISOString()
 }));
-app.get('/health', (_req, res) => res.json({ ok: true, rooms: rooms.size, time: new Date().toISOString() }));
 
 function makeCode() {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
