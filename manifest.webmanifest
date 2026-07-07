@@ -1,0 +1,26 @@
+{
+  "name": "巅峰德州 · 手机联机版",
+  "short_name": "巅峰德州",
+  "description": "2–6 人好友房实时联机德州扑克娱乐游戏",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#06100d",
+  "theme_color": "#07140f",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

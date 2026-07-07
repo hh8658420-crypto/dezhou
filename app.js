@@ -16,6 +16,9 @@ const connectionBadge = $('#connectionBadge');
 const roomMeta = $('#roomMeta');
 const roomCodeText = $('#roomCodeText');
 const copyRoomBtn = $('#copyRoomBtn');
+const shareRoomBtn = $('#shareRoomBtn');
+const installBtn = $('#installBtn');
+const inviteNotice = $('#inviteNotice');
 const startBtn = $('#startBtn');
 const seatsEl = $('#seats');
 const boardCards = $('#boardCards');
@@ -30,11 +33,20 @@ let state = null;
 let lobbyRooms = [];
 let timerAnimation = null;
 let shownResultHand = null;
+let deferredInstallPrompt = null;
 
 const storedName = localStorage.getItem('pokerName');
 nameInput.value = storedName || `玩家${Math.floor(100 + Math.random() * 900)}`;
 const queryRoom = new URLSearchParams(location.search).get('room');
-if (queryRoom) roomInput.value = queryRoom.toUpperCase();
+if (queryRoom) {
+  roomInput.value = queryRoom.toUpperCase();
+  inviteNotice.hidden = false;
+}
+
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (isIOS && !isStandalone) installBtn.hidden = false;
 
 function sessionKey(code) { return `pokerToken:${code}`; }
 function currentName() {
@@ -57,12 +69,13 @@ function setBusy(button, busy) {
 }
 
 function enterRoom(code, token) {
-  localStorage.setItem(sessionKey(code), token);
+  if (token) localStorage.setItem(sessionKey(code), token);
   history.replaceState(null, '', `?room=${encodeURIComponent(code)}`);
   lobby.hidden = true;
   game.hidden = false;
   roomMeta.hidden = false;
   roomCodeText.textContent = code;
+  document.body.classList.add('in-game');
 }
 
 createBtn.addEventListener('click', () => {
@@ -99,6 +112,54 @@ copyRoomBtn.addEventListener('click', async () => {
   } catch {
     showToast(`房间号：${roomCodeText.textContent}`);
   }
+});
+
+shareRoomBtn.addEventListener('click', async () => {
+  const code = roomCodeText.textContent;
+  const inviteUrl = new URL(location.origin);
+  inviteUrl.searchParams.set('room', code);
+  const shareData = {
+    title: '巅峰德州好友房',
+    text: `加入我的德州扑克房间：${code}`,
+    url: inviteUrl.toString()
+  };
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+    await navigator.clipboard.writeText(`${shareData.text}
+${shareData.url}`);
+    showToast('邀请链接已复制');
+  } catch (error) {
+    if (error?.name !== 'AbortError') showToast(`房间号：${code}`);
+  }
+});
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if (!isStandalone) installBtn.hidden = false;
+});
+
+installBtn.addEventListener('click', async () => {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installBtn.hidden = true;
+    return;
+  }
+  if (isIOS) {
+    showToast('iPhone：点浏览器“分享”→“添加到主屏幕”');
+    return;
+  }
+  showToast('请在浏览器菜单中选择“安装应用”或“添加到主屏幕”');
+});
+
+window.addEventListener('appinstalled', () => {
+  installBtn.hidden = true;
+  showToast('已安装到手机桌面');
 });
 
 startBtn.addEventListener('click', () => {
@@ -295,4 +356,13 @@ function cardHtml(card) {
 function formatChips(value) { return Number(value || 0).toLocaleString('zh-CN'); }
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+}
+
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // 联机功能不依赖离线缓存，注册失败时保持正常网页模式。
+    });
+  });
 }

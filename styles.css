@@ -197,3 +197,99 @@ input:focus { border-color: rgba(27,208,139,.7); box-shadow: 0 0 0 3px rgba(27,2
   .log-card { grid-column: auto; }
   .game-log { grid-template-columns: 1fr; }
 }
+
+/* Mobile/PWA enhancements */
+button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+body.in-game { overscroll-behavior-y: contain; }
+.install-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 15px;
+  border: 1px solid rgba(233, 184, 86, .35);
+  border-radius: 12px;
+  color: #ffe09a;
+  background: rgba(233, 184, 86, .1);
+  font-weight: 800;
+}
+.invite-notice {
+  margin: 13px 0 0;
+  padding: 10px 12px;
+  border-radius: 11px;
+  color: #9ff1cf;
+  background: rgba(27, 208, 139, .1);
+  border: 1px solid rgba(27, 208, 139, .22);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.share-btn { color: #231804; background: linear-gradient(135deg, #ffe29a, var(--gold)); border: 0; }
+
+@media (max-width: 800px) {
+  input { font-size: 16px; }
+  .topbar {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+  .brand { gap: 8px; }
+  .brand-mark { width: 35px; height: 35px; border-radius: 10px; font-size: 20px; }
+  .brand strong { font-size: 13px; white-space: nowrap; }
+  .room-meta { gap: 6px; margin-left: auto; }
+  .room-meta span { white-space: nowrap; }
+  .room-meta .mini-btn { padding: 7px 9px; }
+  .game { padding: 7px 7px calc(178px + env(safe-area-inset-bottom)); }
+  .action-panel {
+    position: fixed;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 10px max(9px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(9px, env(safe-area-inset-left));
+    border-radius: 18px 18px 0 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    background: rgba(8, 22, 17, .97);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 -12px 45px rgba(0, 0, 0, .5);
+  }
+  .action-info { margin-bottom: 8px; }
+  .raise-box { margin-bottom: 8px; }
+  .action { min-height: 47px; }
+  .in-game .toast { bottom: calc(178px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 520px) {
+  .room-meta .mini-btn { display: none; }
+  .room-meta .share-btn { display: inline-flex; align-items: center; justify-content: center; }
+  .room-meta span { font-size: 10px; }
+  .room-meta b { letter-spacing: .08em; }
+  .hero-copy p { font-size: 14px; line-height: 1.7; }
+  .feature-row { margin-top: 18px; }
+  .join-panel { padding: 20px 16px; }
+  .action-info { font-size: 11px; gap: 8px; }
+  .raise-box input { padding: 7px 8px; }
+  .action-buttons { gap: 4px; }
+  .action { min-height: 46px; font-size: 11px; border-radius: 10px; }
+  .modal { align-items: start; padding-top: max(78px, env(safe-area-inset-top)); }
+}
+
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 1000px) {
+  .topbar { position: relative; height: 54px; }
+  .game { padding-bottom: calc(132px + env(safe-area-inset-bottom)); }
+  .poker-table { min-height: 430px; border-radius: 42% / 26%; }
+  .seat { width: 112px; min-height: 66px; padding: 7px; }
+  .seat-0 { bottom: 6px; }
+  .seat-1 { bottom: 82px; }
+  .seat-2 { top: 64px; }
+  .seat-3 { top: 6px; }
+  .seat-4 { top: 64px; }
+  .seat-5 { bottom: 82px; }
+  .hole-cards { top: -35px; }
+  .hole-cards .card { width: 29px; height: 39px; }
+  .action-panel { padding-top: 7px; }
+  .action-info { margin-bottom: 5px; }
+  .raise-box { margin-bottom: 5px; grid-template-columns: 1fr 78px; }
+  .action { min-height: 40px; }
+  .side-panel { display: none; }
+  .in-game .toast { bottom: calc(132px + env(safe-area-inset-bottom)); }
+}

@@ -19,7 +19,14 @@ const rooms = new Map();
 const socketSessions = new Map();
 
 app.disable('x-powered-by');
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('trust proxy', 1);
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.webmanifest')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 app.get('/health', (_req, res) => res.json({ ok: true, rooms: rooms.size, time: new Date().toISOString() }));
 
 function makeCode() {

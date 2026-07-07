@@ -4,7 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07140f">
-  <title>巅峰德州 · 联机版</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="巅峰德州">
+  <meta name="format-detection" content="telephone=no">
+  <title>巅峰德州 · 手机联机版</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -17,6 +25,7 @@
       <div class="room-meta" id="roomMeta" hidden>
         <span>房间 <b id="roomCodeText">------</b></span>
         <button id="copyRoomBtn" class="mini-btn">复制房间号</button>
+        <button id="shareRoomBtn" class="mini-btn share-btn">邀请好友</button>
       </div>
       <div id="connectionBadge" class="connection offline">连接中</div>
     </header>
@@ -33,11 +42,13 @@
           <div class="join-panel">
             <label>玩家昵称<input id="nameInput" maxlength="12" placeholder="输入昵称"></label>
             <button id="createBtn" class="primary-btn">创建新房间</button>
+            <button id="installBtn" class="install-btn" hidden>安装到手机桌面</button>
             <div class="divider"><span>或者</span></div>
             <div class="join-row">
               <input id="roomInput" maxlength="6" placeholder="6位房间号" autocomplete="off">
               <button id="joinBtn" class="secondary-btn">加入</button>
             </div>
+            <p id="inviteNotice" class="invite-notice" hidden>已从邀请链接读取房间号，输入昵称后点击“加入”。</p>
             <p class="form-note">游戏仅使用虚拟娱乐筹码，不包含充值、提现或现金交易。</p>
           </div>
         </div>
