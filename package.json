@@ -1,0 +1,22 @@
+{
+  "name": "texas-holdem-online",
+  "version": "1.0.0",
+  "private": true,
+  "description": "多人联机德州扑克娱乐游戏（服务器权威、Socket.IO 实时同步）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
+  }
+}
